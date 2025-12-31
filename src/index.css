@@ -1,0 +1,81 @@
+:root {
+  --bg: #020617;
+  --surface: #0f172a;
+  --surface-2: #1e293b;
+  --border: #334155;
+  --primary: #22c55e;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Layout */
+.app {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+/* Editor Shell */
+.editor-container {
+  width: 100%;
+  max-width: 800px;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.editor-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editor-title {
+  font-size: 1rem;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  color: var(--text);
+}
+
+.editor-title:focus {
+  outline: none;
+  border-bottom: 1px solid var(--primary);
+}
+
+/* Editor */
+.editor {
+  padding: 2rem;
+  min-height: 300px;
+  outline: none;
+  line-height: 1.7;
+}
+
+/* Footer */
+.editor-footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+}
