@@ -79,3 +79,151 @@ body {
   display: flex;
   justify-content: space-between;
 }
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #64748b;
+}
+
+.dot.online {
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34,197,94,0.6);
+}
+
+.dot.offline {
+  background: #ef4444;
+}
+
+.status span:last-child {
+  position: relative;
+}
+
+.status span:last-child::after {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(34,197,94,0.6);
+  transform: translateY(-50%);
+  animation: typingPulse 1.2s infinite;
+}
+
+@keyframes typingPulse {
+  0% { opacity: 0.2; }
+  50% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+.editor {
+  transition: background 0.2s ease;
+}
+
+.editor.remote-update {
+  background: rgba(34,197,94,0.05);
+}
+.editor:focus {
+  box-shadow: inset 0 0 0 1px rgba(34,197,94,0.35);
+}
+
+.editor-container {
+  animation: fadeUp 0.4s ease;
+}
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatars {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  animation: popIn 0.25s ease-out;
+  border: 2px solid var(--surface);
+  margin-left: -8px;
+  z-index: 1;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.avatar:hover {
+  z-index: 10;
+  transform: scale(1.1);
+}
+
+.avatar.typing {
+  box-shadow:
+    0 0 0 4px rgba(255,255,255,0.15),
+    0 0 12px rgba(255,255,255,0.35);
+}
+
+.avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.avatar-label {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(15, 23, 42, 0.95);
+  color: #e5e7eb;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.avatar-wrapper:hover .avatar-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.remote-cursor {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+}

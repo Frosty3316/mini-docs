@@ -4,7 +4,11 @@ import { socket } from "./socket";
 export default function Editor() {
   const [title, setTitle] = useState("Untitled document");
   const [content, setContent] = useState("");
+  const [connected, setConnected] = useState(false);
   const [status, setStatus] = useState("Saved locally");
+  const [users, setUsers] = useState([]);
+  const [cursors, setCursors] = useState({});
+  const [typing, setTyping] = useState(false);
 
   const editorRef = useRef(null);
   const isRemoteUpdate = useRef(false);
@@ -15,26 +19,72 @@ export default function Editor() {
       : content.trim().split(/\s+/).length;
 
   useEffect(() => {
-    socket.on("connect", () => {
-      setStatus("Connected");
+  socket.on("connect", () => {
+    setConnected(true);
+    setStatus("Connected");
+  });
+
+  socket.on("typing", (id) => {
+  setTyping(true);
+
+  const el = document.querySelector(`[data-id="${id}"]`);
+  if (el) {
+    el.classList.add("typing");
+    setTimeout(() => el.classList.remove("typing"), 600);
+  }
+
+  clearTimeout(window.__typingTimeout);
+  window.__typingTimeout = setTimeout(() => {
+      setTyping(false);
+    }, 800);
+  });
+
+  socket.on("cursor", (cursor) => {
+    setCursors((prev) => ({
+      ...prev,
+      [cursor.id]: cursor,
+    }));
+  });
+
+  socket.on("disconnect", () => {
+    setConnected(false);
+    setStatus("Disconnected");
+  });
+
+  socket.on("presence", (userList) => {
+    console.log("PRESENCE EVENT:", userList);
+    setUsers(userList);
+  });
+
+  socket.on("document", (data) => {
+    isRemoteUpdate.current = true;
+    setContent(data);
+
+    if (editorRef.current) {
+      editorRef.current.textContent = data;
+      editorRef.current.classList.add("remote-update");
+      setTimeout(() => {
+        editorRef.current.classList.remove("remote-update");
+      }, 200);
+    }
+
+    setStatus("Synced");
+  });
+
+  return () => {
+    socket.off("connect");
+    socket.off("disconnect");
+    socket.off("presence");  
+    socket.off("document");
+  };
+}, []);
+
+  function handleMouseMove(e) {
+    socket.emit("cursor", {
+      x: e.clientX,
+      y: e.clientY,
     });
-
-    socket.on("document", (data) => {
-      isRemoteUpdate.current = true;
-      setContent(data);
-
-      if (editorRef.current) {
-        editorRef.current.textContent = data;
-      }
-
-      setStatus("Synced");
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.off("document");
-    };
-  }, []);
+  }
 
   function handleInput(e) {
     if (isRemoteUpdate.current) {
@@ -46,32 +96,67 @@ export default function Editor() {
     setContent(text);
     setStatus("Live editing…");
 
+
     socket.emit("edit", text);
+    socket.emit("typing");
   }
 
+  console.log("USERS STATE:", users);
   return (
-    <div className="editor-container">
-      <div className="editor-header">
-        <input
-          className="editor-title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <span>{status}</span>
-      </div>
+  <div className="editor-container">
+    <div className="editor-header">
+  <input
+    className="editor-title"
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+  />
 
-      <div
-        ref={editorRef}
-        className="editor"
-        contentEditable
-        onInput={handleInput}
-        suppressContentEditableWarning
-      />
+{Object.values(cursors).map((c) => (
+  <div
+    key={c.id}
+    className="remote-cursor"
+    style={{
+      left: c.x,
+      top: c.y,
+      background: c.color,
+    }}
+  />
+))}
 
-      <div className="editor-footer">
-        <span>{wordCount} words</span>
-        <span>{content.length} characters</span>
-      </div>
+  <div className="header-right">
+    <div className="avatars">
+      {users.map((user) => (
+        <div key={user.id} className="avatar-wrapper">
+            <span
+                data-id={user.id}
+                className="avatar"
+                style={{ background: user.color }}
+            />
+            <span className="avatar-label">{user.label}</span>
+        </div>
+      ))}
     </div>
-  );
+
+    <div className="status">
+      <span className={`dot ${connected ? "online" : "offline"}`} />
+      <span>{typing ? "Someone is typing…" : status}</span>
+    </div>
+  </div>
+</div>
+
+    <div
+      ref={editorRef}
+      className="editor"
+      contentEditable
+      onInput={handleInput}
+      onMouseMove={handleMouseMove}
+      suppressContentEditableWarning
+    />
+
+    <div className="editor-footer">
+      <span>{wordCount} words</span>
+      <span>{content.length} characters</span>
+    </div>
+  </div>
+);
 }
