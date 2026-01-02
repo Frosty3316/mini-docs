@@ -9,6 +9,7 @@ export default function Editor() {
   const [users, setUsers] = useState([]);
   const [cursors, setCursors] = useState({});
   const [typing, setTyping] = useState(false);
+  const [typingUser, setTypingUser] = useState(null);
 
   const editorRef = useRef(null);
   const isRemoteUpdate = useRef(false);
@@ -23,6 +24,11 @@ export default function Editor() {
     setConnected(true);
     setStatus("Connected");
   });
+
+  socket.on("typing", (id) => {
+  setTypingUser(id);
+  setTimeout(() => setTypingUser(null), 1000);
+});
 
   socket.on("typing", (id) => {
   setTyping(true);
@@ -125,21 +131,24 @@ export default function Editor() {
 
   <div className="header-right">
     <div className="avatars">
-      {users.map((user) => (
-        <div key={user.id} className="avatar-wrapper">
-            <span
-                data-id={user.id}
-                className="avatar"
-                style={{ background: user.color }}
-            />
-            <span className="avatar-label">{user.label}</span>
-        </div>
-      ))}
-    </div>
+  {users.map((user, i) => (
+    <span
+      key={user.id}
+      data-id={user.id}
+      className="avatar"
+      style={{ background: user.color }}
+      title={`User ${i + 1}`}
+    />
+  ))}
+</div>
 
     <div className="status">
       <span className={`dot ${connected ? "online" : "offline"}`} />
-      <span>{typing ? "Someone is typing…" : status}</span>
+      {typingUser && (
+  <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>
+    Someone is typing…
+  </span>
+)}
     </div>
   </div>
 </div>
