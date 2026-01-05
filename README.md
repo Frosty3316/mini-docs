@@ -114,3 +114,17 @@ Rather than:
 ## 🏁 Conclusion
 
 Mini Docs demonstrates the design and deployment of a real-time collaborative system with intentional tradeoffs, clean UX, and production-ready deployment.
+
+---
+
+## 📐 Architecture Diagram
+
+Client (React)
+   │
+   │ WebSocket (Socket.IO)
+   ▼
+Server (Node.js)
+   │
+   ├─ Document Room A
+   ├─ Document Room B
+   └─ Document Room C
