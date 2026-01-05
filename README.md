@@ -119,12 +119,12 @@ Mini Docs demonstrates the design and deployment of a real-time collaborative sy
 
 ## 📐 Architecture Diagram
 
-Client (React)
-   │
-   │ WebSocket (Socket.IO)
-   ▼
-Server (Node.js)
-   │
-   ├─ Document Room A
-   ├─ Document Room B
-   └─ Document Room C
+Client (React)       
+   │                
+   │ WebSocket (Socket.IO)         
+   ▼            
+Server (Node.js)           
+   │              
+   ├─ Document Room A            
+   ├─ Document Room B         
+   └─ Document Room C             
