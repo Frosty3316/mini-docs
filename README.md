@@ -3,7 +3,7 @@ A real-time collaborative document editor inspired by Google Docs.
 
 Mini Docs allows multiple users to edit documents simultaneously with live presence, cursors, typing indicators, and multi-document support.
 
-🔗 Live Demo: <YOUR_NETLIFY_URL>  
+🔗 Live Demo: https://harmonious-klepon-777dcc.netlify.app
 🔌 Server: https://mini-docs-twm4.onrender.com
 
 ---
