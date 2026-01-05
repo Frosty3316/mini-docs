@@ -1,4 +1,4 @@
-# Mini Docs 📝  
+# Mini Docs 📝   
 A real-time collaborative document editor inspired by Google Docs.
 
 Mini Docs allows multiple users to edit documents simultaneously with live presence, cursors, typing indicators, and multi-document support.
