@@ -10,6 +10,7 @@ function randomSymbol() {
 export default function Editor() {
   const [content, setContent] = useState("");
   const [status, setStatus] = useState("Idle");
+  const [theme, setTheme] = useState("dark");
 
   const [users, setUsers] = useState([]);
   const [typingUser, setTypingUser] = useState(null);
@@ -20,6 +21,26 @@ export default function Editor() {
 
   const editorRef = useRef(null);
   const isRemoteUpdate = useRef(false);
+
+  /* ---------- THEME ---------- */
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    if (theme === "light") {
+      root.style.setProperty("--bg", "#f8fafc");
+      root.style.setProperty("--surface", "#ffffff");
+      root.style.setProperty("--border", "#e2e8f0");
+      root.style.setProperty("--text", "#020617");
+      root.style.setProperty("--muted", "#475569");
+    } else {
+      root.style.setProperty("--bg", "#020617");
+      root.style.setProperty("--surface", "#0f172a");
+      root.style.setProperty("--border", "#334155");
+      root.style.setProperty("--text", "#e5e7eb");
+      root.style.setProperty("--muted", "#94a3b8");
+    }
+  }, [theme]);
 
   /* ---------- SOCKET ---------- */
 
@@ -34,12 +55,7 @@ export default function Editor() {
     });
 
     socket.on("documents-updated", (ids) => {
-      setDocs(
-        ids.map((id, i) => ({
-          id,
-          title: `Doc ${i + 1}`,
-        }))
-      );
+      setDocs(ids.map((id, i) => ({ id, title: `Doc ${i + 1}` })));
     });
 
     socket.on("document", (data) => {
@@ -86,6 +102,15 @@ export default function Editor() {
     socket.emit("typing", { docId: activeDoc });
   }
 
+  function handleMouseMove(e) {
+    if (!activeDoc) return;
+    socket.emit("cursor", {
+      docId: activeDoc,
+      x: e.nativeEvent.offsetX,
+      y: e.nativeEvent.offsetY,
+    });
+  }
+
   /* ---------- RENDER ---------- */
 
   return (
@@ -124,11 +149,12 @@ export default function Editor() {
           </button>
         </div>
 
-        {/* EDITOR CONTAINER — ALWAYS PRESENT */}
         <div className="editor-container">
 
-          {/* HEADER (RESTORED) */}
+          {/* HEADER */}
           <div className="editor-header">
+            <div /> {/* left spacer */}
+
             <div className="status">
               <span>
                 {typingUser ? "Someone is typing…" : status}
@@ -146,13 +172,24 @@ export default function Editor() {
                   </span>
                 ))}
               </div>
+
+              <button
+                className={`theme-toggle ${theme}`}
+                onClick={() =>
+                  setTheme((t) => (t === "dark" ? "light" : "dark"))
+                }
+              >
+                <span className="theme-icon">
+                  {theme === "dark" ? "☀" : "🌙"}
+                </span>
+              </button>
             </div>
           </div>
 
           {/* EMPTY STATE */}
           {!activeDoc && (
             <div className="empty-state">
-              <p>Create or Join a document to start collaborating</p>
+              <p>Create or join a document to start collaborating</p>
             </div>
           )}
 
@@ -176,12 +213,13 @@ export default function Editor() {
                 className="editor"
                 contentEditable
                 onInput={handleInput}
+                onMouseMove={handleMouseMove}
                 suppressContentEditableWarning
               />
             </>
           )}
 
-          {/* FOOTER (RESTORED) */}
+          {/* FOOTER */}
           <div className="editor-footer">
             <span>{content.split(/\s+/).filter(Boolean).length} words</span>
             <span>{content.length} characters</span>
