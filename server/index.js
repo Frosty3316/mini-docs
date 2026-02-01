@@ -1,7 +1,7 @@
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-const cors = require("cors");
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+import cors from "cors";
 
 const app = express();
 app.use(cors());
@@ -9,42 +9,54 @@ app.use(cors());
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
 });
 
-/* -------- STATE -------- */
+const documents = {};
+const users = {};
 
-const documents = {}; // { docId: content }
-const users = {};     // { socketId: { id, color, label, docId } }
-
-/* -------- SOCKET -------- */
+function randomColor() {
+  const colors = ["#38bdf8", "#f472b6", "#34d399", "#facc15", "#a78bfa"];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
 
 io.on("connection", (socket) => {
-  const color = `hsl(${Math.floor(Math.random() * 360)},70%,60%)`;
-  const label = `User ${Object.keys(users).length + 1}`;
+  console.log("User connected:", socket.id);
 
   users[socket.id] = {
     id: socket.id,
-    color,
-    label,
+    color: randomColor(),
+    label: `User ${Object.keys(users).length + 1}`,
     docId: null,
   };
 
-  socket.on("join-document", (docId) => {
-    const prev = users[socket.id].docId;
+  // ✅ CRITICAL FIX:
+  // Tell the client about existing documents immediately on connect
+  socket.emit("documents-updated", Object.keys(documents));
 
-    if (prev) {
-      socket.leave(prev);
-      emitPresence(prev);
+  socket.on("join-document", (docId) => {
+    if (users[socket.id].docId) {
+      socket.leave(users[socket.id].docId);
     }
 
-    socket.join(docId);
     users[socket.id].docId = docId;
+    socket.join(docId);
 
-    if (!documents[docId]) documents[docId] = "";
+    if (!documents[docId]) {
+      documents[docId] = "";
+    }
 
     socket.emit("document", documents[docId]);
-    emitPresence(docId);
+
+    const roomUsers = Object.values(users).filter(
+      (u) => u.docId === docId
+    );
+
+    io.to(docId).emit("presence", roomUsers);
+
     io.emit("documents-updated", Object.keys(documents));
   });
 
@@ -62,7 +74,7 @@ io.on("connection", (socket) => {
       id: socket.id,
       x,
       y,
-      color: users[socket.id].color,
+      color: users[socket.id]?.color,
     });
   });
 
@@ -70,30 +82,30 @@ io.on("connection", (socket) => {
     delete documents[docId];
 
     Object.values(users).forEach((u) => {
-      if (u.docId === docId) u.docId = null;
+      if (u.docId === docId) {
+        u.docId = null;
+      }
     });
 
     io.emit("documents-updated", Object.keys(documents));
   });
 
   socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+
     const docId = users[socket.id]?.docId;
     delete users[socket.id];
-    if (docId) emitPresence(docId);
+
+    if (docId) {
+      const roomUsers = Object.values(users).filter(
+        (u) => u.docId === docId
+      );
+      io.to(docId).emit("presence", roomUsers);
+    }
   });
 });
 
-/* -------- HELPERS -------- */
-
-function emitPresence(docId) {
-  const present = Object.values(users).filter(u => u.docId === docId);
-  io.to(docId).emit("presence", present);
-}
-
-/* -------- START -------- */
-
 const PORT = process.env.PORT || 3001;
-
 server.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
