@@ -152,7 +152,7 @@ export default function Editor() {
           {/* EMPTY STATE */}
           {!activeDoc && (
             <div className="empty-state">
-              <p>Create a document to start collaborating</p>
+              <p>Create or Join a document to start collaborating</p>
             </div>
           )}
 
