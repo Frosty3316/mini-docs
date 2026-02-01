@@ -250,3 +250,28 @@ mark {
   transform: translate(-50%, -50%);
   z-index: 10;
 }
+
+.connection-text {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.dot.connecting {
+  background: #facc15; /* yellow */
+}
+
+.dot.connected {
+  background: #22c55e; /* green */
+}
+
+.dot.error {
+  background: #ef4444; /* red */
+}
+
+.empty-state {
+  margin: 3rem auto;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+  user-select: none;
+}
