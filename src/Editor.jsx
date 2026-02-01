@@ -101,6 +101,15 @@ export default function Editor() {
               onClick={() => setActiveDoc(doc.id)}
             >
               {doc.title}
+              <span
+                className="delete-doc"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  socket.emit("delete-document", doc.id);
+                }}
+              >
+                ✕
+              </span>
             </button>
           ))}
           <button
@@ -115,8 +124,30 @@ export default function Editor() {
           </button>
         </div>
 
-        {/* EDITOR CONTAINER — ALWAYS RENDERED */}
+        {/* EDITOR CONTAINER — ALWAYS PRESENT */}
         <div className="editor-container">
+
+          {/* HEADER (RESTORED) */}
+          <div className="editor-header">
+            <div className="status">
+              <span>
+                {typingUser ? "Someone is typing…" : status}
+              </span>
+
+              <div className="avatars-inline">
+                {users.map((u) => (
+                  <span
+                    key={u.id}
+                    className="avatar"
+                    style={{ background: u.color }}
+                    title={u.label}
+                  >
+                    {u.symbol}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
 
           {/* EMPTY STATE */}
           {!activeDoc && (
@@ -125,28 +156,9 @@ export default function Editor() {
             </div>
           )}
 
-          {/* ACTIVE DOC UI */}
+          {/* EDITOR */}
           {activeDoc && (
             <>
-              <div className="status">
-                <span>
-                  {typingUser ? "Someone is typing…" : status}
-                </span>
-
-                <div className="avatars-inline">
-                  {users.map((u) => (
-                    <span
-                      key={u.id}
-                      className="avatar"
-                      style={{ background: u.color }}
-                      title={u.label}
-                    >
-                      {u.symbol}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
               {Object.values(cursors).map((c) => (
                 <div
                   key={c.id}
@@ -168,6 +180,13 @@ export default function Editor() {
               />
             </>
           )}
+
+          {/* FOOTER (RESTORED) */}
+          <div className="editor-footer">
+            <span>{content.split(/\s+/).filter(Boolean).length} words</span>
+            <span>{content.length} characters</span>
+          </div>
+
         </div>
       </div>
     </div>
