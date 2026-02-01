@@ -107,9 +107,11 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  min-height: 75vh;
+  min-height: 70vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  justify-content: stretch;
 }
 
 .editor-header {
@@ -274,4 +276,16 @@ mark {
   color: var(--muted);
   font-size: 0.95rem;
   user-select: none;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editor-container > .empty-state {
+  flex: 1;
+}
+
+.empty-state p {
+  opacity: 0.85;
 }

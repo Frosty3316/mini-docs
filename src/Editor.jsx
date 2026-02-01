@@ -115,56 +115,60 @@ export default function Editor() {
           </button>
         </div>
 
-        {/* EMPTY STATE */}
-        {docs.length === 0 && (
-          <div className="empty-state">
-            <p>Create a document to start collaborating</p>
-          </div>
-        )}
+        {/* EDITOR CONTAINER — ALWAYS RENDERED */}
+        <div className="editor-container">
 
-        {/* EDITOR */}
-        {activeDoc && (
-          <div className="editor-container">
-            <div className="status">
-              <span>
-                {typingUser ? "Someone is typing…" : status}
-              </span>
-
-              <div className="avatars-inline">
-                {users.map((u) => (
-                  <span
-                    key={u.id}
-                    className="avatar"
-                    style={{ background: u.color }}
-                    title={u.label}
-                  >
-                    {u.symbol}
-                  </span>
-                ))}
-              </div>
+          {/* EMPTY STATE */}
+          {!activeDoc && (
+            <div className="empty-state">
+              <p>Create a document to start collaborating</p>
             </div>
+          )}
 
-            {Object.values(cursors).map((c) => (
+          {/* ACTIVE DOC UI */}
+          {activeDoc && (
+            <>
+              <div className="status">
+                <span>
+                  {typingUser ? "Someone is typing…" : status}
+                </span>
+
+                <div className="avatars-inline">
+                  {users.map((u) => (
+                    <span
+                      key={u.id}
+                      className="avatar"
+                      style={{ background: u.color }}
+                      title={u.label}
+                    >
+                      {u.symbol}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {Object.values(cursors).map((c) => (
+                <div
+                  key={c.id}
+                  className="remote-cursor"
+                  style={{
+                    left: c.x,
+                    top: c.y,
+                    background: c.color,
+                  }}
+                />
+              ))}
+
               <div
-                key={c.id}
-                className="remote-cursor"
-                style={{
-                  left: c.x,
-                  top: c.y,
-                  background: c.color,
-                }}
+                ref={editorRef}
+                className="editor"
+                contentEditable
+                onInput={handleInput}
+                suppressContentEditableWarning
               />
-            ))}
-
-            <div
-              ref={editorRef}
-              className="editor"
-              contentEditable
-              onInput={handleInput}
-              suppressContentEditableWarning
-            />
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
