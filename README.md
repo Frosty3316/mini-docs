@@ -100,6 +100,33 @@ Rather than:
 
 ---
 
+## 🧪 Running Locally (Optional)
+
+Mini Docs is fully deployed and usable via the live demo.  
+Local setup is intended for developers who want to inspect or extend the real-time collaboration logic.
+
+### Server
+```bash
+git clone https://github.com/Frosty3316/mini-docs.git
+cd mini-docs/server
+npm install
+npm run dev
+```
+
+### Client
+```bash
+cd ../client
+npm install
+npm run dev
+```
+
+**Notes**
+- Open multiple browser tabs to simulate different users
+- Each document operates in an isolated Socket.IO room
+- In-memory storage is used to focus on real-time collaboration mechanics
+
+---
+
 ## 🧪 Future Improvements
 
 - Persistent storage (database)
@@ -113,7 +140,7 @@ Rather than:
 
 ## 🏁 Conclusion
 
-Mini Docs demonstrates the design and deployment of a real-time collaborative system with intentional tradeoffs, clean UX, and production-ready deployment.
+Mini Docs demonstrates the design and deployment of a real-time collaborative system with intentional tradeoffs, clean UX, and production-ready deployment, with a focus on WebSocket-based synchronization and room-scoped state management.
 
 ---
 
