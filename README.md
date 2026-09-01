@@ -1,157 +1,83 @@
-# Mini Docs 📝   
-A real-time collaborative document editor inspired by Google Docs.
+# Inkroom
 
-Mini Docs allows multiple users to edit documents simultaneously with live presence, cursors, typing indicators, and multi-document support.
+A real-time collaborative notepad: open a room and write together.
 
-🔗 Live Demo: https://harmonious-klepon-777dcc.netlify.app    
-🔌 Server: https://mini-docs-twm4.onrender.com
+Live presence, named pages, in-document search, and light/dark theme.
 
----
-
-## ✨ Features
-
-- Real-time collaborative editing
-- Multi-document support
-- Live user presence with avatars
-- Typing indicators
-- Cursor tracking scoped to each document
-- Dark / Light mode with smooth transitions
-- In-document search (Ctrl + F)
-- Socket room isolation per document
-- Deployed and publicly accessible
+**Live demo:** https://inkroom-swart.vercel.app  
+**Server:** https://mini-docs-twm4.onrender.com
 
 ---
 
-## 🧠 Architecture Overview
+## Features
 
-Mini Docs uses a client–server real-time architecture built on WebSockets.
-
-### Client
-- React (Vite)
-- ContentEditable-based text editor
-- Socket.IO client
-- CSS variables for theming
-
-### Server
-- Node.js + Express
-- Socket.IO
-- In-memory document and user state
-
-### Communication
-- WebSocket connections via Socket.IO
-- Each document corresponds to a separate socket room
-- Edits and presence events are broadcast only within the active room
+- Real-time collaborative editing over Socket.IO rooms
+- Named pages in a sidebar (create / rename / delete)
+- Shareable page links (`/d/:id`) — **Share** copies an invite URL
+- Live presence avatars
+- Typing indicators and throttled remote cursors
+- In-page search (`Ctrl+F` / `Cmd+F`)
+- Light / dark theme (OS default, persisted)
+- Connection status for Render cold starts
 
 ---
 
-## 🔁 Data Flow
+## Architecture
 
-1. User opens the app and joins a document
-2. Client emits `join-document` with document ID
-3. Server assigns socket to a document-specific room
-4. Server sends:
-   - current document content
-   - list of active users in the room
-5. On edit:
-   - client emits `edit`
-   - server updates document state
-   - changes are broadcast to other users in the same room
+**Client:** React (Vite) on Vercel  
+**Server:** Node.js + Express + Socket.IO on Render (long-lived WebSockets; not a Vercel serverless function)
+
+Each page is a socket room. Document text and titles live in memory on the server.
 
 ---
 
-## ⚖️ Design Decisions & Tradeoffs
+## Local setup
 
-### Why Socket.IO?
-Socket.IO simplifies:
-- room management
-- reconnection handling
-- real-time event broadcasting
+**Server**
 
-### Why not CRDTs or Operational Transforms?
-To keep the project focused and understandable, Mini Docs uses a guarded last-write-wins model instead of complex CRDTs. This avoids cursor jumpiness while maintaining real-time collaboration.
-
-### Why in-memory storage?
-Persistence was intentionally excluded to prioritize:
-- real-time collaboration mechanics
-- clean architecture
-- scope control
-
----
-
-## 📌 Scope Justification
-
-This project focuses on:
-- real-time systems
-- UX clarity
-- collaboration mechanics
-
-Rather than:
-- long-term storage
-- advanced conflict resolution
-- formatting-heavy editors
-
----
-
-## 🚀 Deployment
-
-- Frontend: Netlify
-- Backend: Render
-- Environment variables used for deployment-safe configuration
-
----
-
-## 🧪 Running Locally (Optional)
-
-Mini Docs is fully deployed and usable via the live demo.  
-Local setup is intended for developers who want to inspect or extend the real-time collaboration logic.
-
-### Server
 ```bash
-git clone https://github.com/Frosty3316/mini-docs.git
-cd mini-docs/server
+cd server
+npm install
+npm start
+```
+
+**Client**
+
+```bash
+cp .env.example .env
 npm install
 npm run dev
 ```
 
-### Client
-```bash
-cd ../client
-npm install
-npm run dev
-```
-
-**Notes**
-- Open multiple browser tabs to simulate different users
-- Each document operates in an isolated Socket.IO room
-- In-memory storage is used to focus on real-time collaboration mechanics
+| Variable | Where | Purpose |
+| --- | --- | --- |
+| `VITE_SOCKET_URL` | Vercel / client `.env` | Socket server URL |
+| `CLIENT_ORIGIN` | Render | Extra allowed CORS origins (Vercel `*.vercel.app` is already allowed) |
+| `PORT` | Render | Listen port, default `3001` |
 
 ---
 
-## 🧪 Future Improvements
+## Keyboard
 
-- Persistent storage (database)
-- User authentication
-- Version history
-- Rich text formatting
-- Document permissions
-- Offline handling
-
----
-
-## 🏁 Conclusion
-
-Mini Docs demonstrates the design and deployment of a real-time collaborative system with intentional tradeoffs, clean UX, and production-ready deployment, with a focus on WebSocket-based synchronization and room-scoped state management.
+| Shortcut | Action |
+| --- | --- |
+| `Ctrl+F` / `Cmd+F` | Find in the current page |
+| `Enter` / `F3` | Next match |
+| `Shift+Enter` | Previous match |
+| `Esc` | Close find |
 
 ---
 
-## 📐 Architecture Diagram
+## Deploy
 
-Client (React)       
-   │                
-   │ WebSocket (Socket.IO)         
-   ▼            
-Server (Node.js)           
-   │              
-   ├─ Document Room A            
-   ├─ Document Room B         
-   └─ Document Room C             
+- **Frontend:** Vercel project at the repo root (`npm run build` → `dist`). Set `VITE_SOCKET_URL=https://mini-docs-twm4.onrender.com` and redeploy.
+- **Backend:** Render web service from `server/`. Optional: `CLIENT_ORIGIN=https://your-app.vercel.app`
+
+---
+
+## Known limits
+
+- No database — pages disappear on server restart
+- Last-write-wins, not CRDT/OT
+- No accounts; anyone with the page link can edit
+- Remote cursors follow the pointer, not the text caret

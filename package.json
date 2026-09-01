@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "inkroom",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,6 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tiptap/extension-placeholder": "^3.31.0",
+    "@tiptap/extension-text-style": "^3.31.0",
+    "@tiptap/extension-underline": "^3.31.0",
+    "@tiptap/pm": "^3.31.0",
+    "@tiptap/react": "^3.31.0",
+    "@tiptap/starter-kit": "^3.31.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "socket.io-client": "^4.8.3"
