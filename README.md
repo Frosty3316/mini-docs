@@ -4,7 +4,7 @@ A real-time collaborative notepad: open a room and write together.
 
 Live presence, named pages, in-document search, and light/dark theme.
 
-**Live demo:** https://inkroom-swart.vercel.app  
+**Live demo:** https://inkroom-swart.vercel.app/  
 **Server:** https://mini-docs-twm4.onrender.com
 
 ---
@@ -24,7 +24,7 @@ Live presence, named pages, in-document search, and light/dark theme.
 
 ## Architecture
 
-**Client:** React (Vite) on Vercel  
+**Client:** React (Vite) + TipTap on Vercel  
 **Server:** Node.js + Express + Socket.IO on Render (long-lived WebSockets; not a Vercel serverless function)
 
 Each page is a socket room. Document text and titles live in memory on the server.
